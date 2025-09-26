@@ -7,5 +7,8 @@ urlpatterns = [
     path('login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    path('protected/', protected_view, name='protected'),
+    path('documents/', DocumentUploadView.as_view(), name='document-upload'),       # POST
+    path('documents/list/', DocumentListView.as_view(), name='document-list'),       # GET
+    path('documents/<int:pk>/', DocumentDetailView.as_view(), name='document-detail'), # GET
+
 ]

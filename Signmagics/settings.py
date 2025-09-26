@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'Documents',
-    
+    'signatures',
+    'logs'
 ]
 
 AUTH_USER_MODEL = 'Documents.CustomUser'
@@ -51,11 +52,13 @@ REST_FRAMEWORK = {
     ),
 }
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
 
 MIDDLEWARE = [
@@ -139,3 +142,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
