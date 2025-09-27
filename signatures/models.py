@@ -15,7 +15,8 @@ class DocumentSignature(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name="document_signatures")
     edited_file = models.FileField(upload_to="documents/with_signatures/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True,null= True, blank=True)
-    signer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null= True, blank=True)
+    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null= True, blank=True)
+    draft = models.BooleanField(default=False)
     
 
 class DocumentSignatureStatus(models.Model):

@@ -35,20 +35,44 @@ class DocumentUploadView(generics.CreateAPIView):
 
 
 # List all documents
-class DocumentListView(generics.ListAPIView):
-    serializer_class = DocumentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.db.models import Count, Q, F
 
-    def get_queryset(self):
-        queryset = Document.objects.all().order_by('-created_at')
-        # optional filters from query params
-        owner = self.request.query_params.get('owner')
-        if owner:
-            queryset = queryset.filter(owner_id=owner)
-        return queryset
+from .serializers import DocumentSerializer  # Or wherever it's defined
 
-    def get_serializer_context(self):
-        return {"request": self.request}
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Document, CustomUser
+from .serializers import DocumentSerializer
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Document, CustomUser
+from .serializers import DocumentSerializer
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def documents_by_person(request, person_id):
+    """
+    Fetch all documents uploaded by a specific person (owner).
+    """
+    try:
+        owner = CustomUser.objects.get(id=person_id)
+    except CustomUser.DoesNotExist:
+        return Response({"detail": "User not found"}, status=404)
+
+    documents = Document.objects.filter(owner=owner).order_by('-created_at')
+    serializer = DocumentSerializer(documents, many=True, context={"request": request})
+
+    return Response({
+        "status": "success",
+        "documents": serializer.data
+    })
 
 
 # Get document details by ID
@@ -59,3 +83,157 @@ class DocumentDetailView(generics.RetrieveAPIView):
 
     def get_serializer_context(self):
         return {"request": self.request}
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.db.models import Count, Q, F
+from signatures.models import *
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def overview(request):
+    """
+    Return counts for overview dashboard:
+    - total documents
+    - total fully signed documents
+    - pending documents
+    - total users
+    """
+    total_documents = Document.objects.count()
+
+    # Fully signed documents (all signatures approved, not draft)
+    fully_signed_docs = (
+        DocumentSignature.objects
+        .annotate(
+            total_statuses=Count("signature_statuses"),
+            approved_statuses=Count("signature_statuses", filter=Q(signature_statuses__status="approved"))
+        )
+        .filter(total_statuses=F("approved_statuses"), draft=False)
+        .count()
+    )
+
+    # Pending documents: document signatures with at least one pending status
+    pending_docs = (
+        DocumentSignature.objects
+        .filter(
+            draft=False,
+            signature_statuses__status="pending"
+        )
+        .distinct()
+        .count()
+    )
+
+    total_users = CustomUser.objects.count()
+
+    return Response({
+        "status": "success",
+        "total_documents": total_documents,
+        "fully_signed_documents": fully_signed_docs,
+        "pending_documents": pending_docs,
+        "total_users": total_users
+    })
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import CustomUser
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def list_users(request):
+    """
+    Fetch all users. Optional query params: ?role=signer&department=IT
+    """
+    queryset = CustomUser.objects.all()
+
+    # Optional filters
+    role = request.query_params.get("role")
+    if role:
+        queryset = queryset.filter(role=role)
+
+    department = request.query_params.get("department")
+    if department:
+        queryset = queryset.filter(department=department)
+
+    # Prepare response
+    users = []
+    for user in queryset:
+        users.append({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "department": getattr(user, "department", None),  # if department exists
+            "post": user.post
+        })
+
+    return Response({
+        "status": "success",
+        "users": users
+    })
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import CustomUser
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def list_signers(request):
+    """
+    Fetch all users with role='signer'
+    """
+    signers = CustomUser.objects.filter(role="signer")
+
+    # Prepare response
+    users = []
+    for user in signers:
+        users.append({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "department": getattr(user, "department", None),
+            "post": user.post
+        })
+
+    return Response({
+        "status": "success",
+        "signers": users
+    })
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from .models import CustomUser
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def user_profile_by_id(request, user_id):
+    """
+    Fetch the profile of a user by their ID
+    """
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    profile_data = {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "role": user.role,
+        "department": getattr(user, "department", None),
+        "post": user.post,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "is_active": user.is_active,
+    }
+
+    return Response({
+        "status": "success",
+        "profile": profile_data
+    })

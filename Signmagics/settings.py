@@ -40,8 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'Documents',
-    'signatures',
-    'logs'
+    'signatures'
 ]
 
 AUTH_USER_MODEL = 'Documents.CustomUser'
