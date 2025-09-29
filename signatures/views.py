@@ -8,11 +8,11 @@ from rest_framework.response import Response
 from rest_framework import status as drf_status
 from django.db.models import Count, Q, F
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 
 
 # Upload a signature (POST)
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def upload_signature(request):
@@ -117,11 +117,6 @@ def assign_multiple_signatures(request, pk):
 
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from .models import DocumentSignature
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -177,11 +172,6 @@ def user_signed_documents(request, user_id):
     })
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import DocumentSignature, DocumentSignatureStatus, Signature, CustomUser
-from .serializers import DocumentSignatureSerializer
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -214,10 +204,6 @@ def signature_files_for_person(request, signature_id):
     })
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
 
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
@@ -250,10 +236,6 @@ def document_sign_status(request, doc_sig_status_id, action):
     }, status=status.HTTP_200_OK)
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import DocumentSignature, DocumentSignatureStatus
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -290,10 +272,6 @@ def document_signature_status(request, doc_sig_id):
 
 
 
-from django.db.models import Count, Q, F
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

@@ -6,8 +6,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
-from .models import Document
+from .models import *
 from .serializers import *
+from django.db.models import Count, Q, F
+from signatures.models import *
+from django.shortcuts import get_object_or_404
+
 
 User = get_user_model()
 
@@ -35,26 +39,6 @@ class DocumentUploadView(generics.CreateAPIView):
 
 
 # List all documents
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.db.models import Count, Q, F
-
-from .serializers import DocumentSerializer  # Or wherever it's defined
-
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import Document, CustomUser
-from .serializers import DocumentSerializer
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import Document, CustomUser
-from .serializers import DocumentSerializer
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def documents_by_person(request, person_id):
@@ -84,12 +68,6 @@ class DocumentDetailView(generics.RetrieveAPIView):
     def get_serializer_context(self):
         return {"request": self.request}
 
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.db.models import Count, Q, F
-from signatures.models import *
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -136,11 +114,6 @@ def overview(request):
     })
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import CustomUser
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_users(request):
@@ -176,10 +149,6 @@ def list_users(request):
     })
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import CustomUser
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -207,11 +176,6 @@ def list_signers(request):
     })
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from .models import CustomUser
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

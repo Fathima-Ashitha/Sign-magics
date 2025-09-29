@@ -24,9 +24,6 @@ class AssignMultipleSignaturesSerializer(serializers.Serializer):
 
 
 
-from rest_framework import serializers
-from .models import DocumentSignature, Document
-
 class DocumentSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
 
@@ -39,6 +36,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         if obj.file and request:
             return request.build_absolute_uri(obj.file.url)
         return None
+
 
 class DocumentSignatureSerializer(serializers.ModelSerializer):
     document = DocumentSerializer(read_only=True)
