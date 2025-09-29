@@ -231,13 +231,12 @@ def document_sign_status(request, doc_sig_status_id, action):
         return Response({"detail": "Invalid action. Must be 'approve' or 'reject'."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        doc_status = DocumentSignatureStatus.objects.get(id=doc_sig_status_id)
+        doc_status = DocumentSignatureStatus.objects.get(
+            document_signature=doc_sig_status_id,
+            signature__user = request.user
+            )
     except DocumentSignatureStatus.DoesNotExist:
-        return Response({"detail": "DocumentSignatureStatus not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    # Only signer of the signature can change the status
-    if doc_status.signature.user != request.user:
-        return Response({"detail": "You are not authorized to update this signature status."}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "Not found or unauthorized."}, status=status.HTTP_404_NOT_FOUND)
 
     # Update status
     doc_status.status = "approved" if action == "approve" else "rejected"

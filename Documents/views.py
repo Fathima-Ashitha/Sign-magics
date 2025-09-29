@@ -101,7 +101,6 @@ def overview(request):
     - pending documents
     - total users
     """
-    total_documents = Document.objects.count()
 
     # Fully signed documents (all signatures approved, not draft)
     fully_signed_docs = (
@@ -126,6 +125,7 @@ def overview(request):
     )
 
     total_users = CustomUser.objects.count()
+    total_documents = fully_signed_docs + pending_docs
 
     return Response({
         "status": "success",
